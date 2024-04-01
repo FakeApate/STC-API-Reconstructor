@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "source-map": "^0.7.4"
+  },
+  "name": "reconstruct",
+  "version": "1.0.0",
+  "main": "reconstruct.js",
+  "devDependencies": {},
+  "scripts": {
+    "reconstruct": "node reconstruct.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "description": ""
+}
