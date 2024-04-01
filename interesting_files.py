@@ -1,9 +1,9 @@
 # Regex for extraction
 REGEX_MATCH_PROXY = r"context = '(?P<proxy>.*)'"
 REGEX_MATCH_ENUM = r"enum (?P<name>\w+) {(?P<content>[\w\/=',\n ]+)}"
-# sub example: re.sub(REGEX_SUB_COMMENTS[0], REGEX_SUB_COMMENTS[1], input, 0, re.MULTILINE)
+
 # Files
-FILES = [
+ENUMS = [
     "out\\originals\\app\\api\\services\\logismata-api-service.ts",
     "out\\originals\\app\\enums\\calculator-enum.ts",
     "out\\originals\\app\\enums\\canton-enum.ts",
@@ -18,3 +18,5 @@ FILES = [
     "out\\originals\\app\\enums\\tax-group-id-enum.ts",
     "out\\originals\\app\\enums\\tax-scale-target-enum.ts",
 ]
+
+PROXY = "out\\originals\\app\\api\\services\\logismata-api-service.ts"

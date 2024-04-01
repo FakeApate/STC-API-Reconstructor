@@ -1,8 +1,11 @@
-import requests
-import re
 import os
+import re
 import subprocess
-import interesting_files
+
+import requests
+
+from interesting_files import ENUMS, PROXY, REGEX_MATCH_ENUM, REGEX_MATCH_PROXY
+
 
 def download_file(url, filename):
     """
@@ -11,11 +14,12 @@ def download_file(url, filename):
     print(f"Downloading {url}...")
     response = requests.get(url)
     if response.status_code == 200:
-        with open(filename, 'wb') as file:
+        with open(filename, "wb") as file:
             file.write(response.content)
         print(f"Downloaded successfully and saved as {filename}.")
     else:
         print(f"Failed to download {url}")
+
 
 # The base URL of the website from which to scrape and download scripts
 base_url = "https://swisstaxcalculator.estv.admin.ch"
@@ -40,8 +44,10 @@ if matches:
         filepath, filename = os.path.split(match)
         script_url = base_url + match
         script_response = requests.get(script_url)
-        sourcemap_match = next(iter(pattern_sourcemap.findall(script_response.text)), None)
-        
+        sourcemap_match = next(
+            iter(pattern_sourcemap.findall(script_response.text)), None
+        )
+
         if sourcemap_match:
             sourcemap_url = base_url + filepath + "/" + sourcemap_match
             sources.append((script_url, sourcemap_url))
@@ -60,17 +66,24 @@ for script_url, sourcemap_url in sources:
 
 # Run the reconstruct script using npm
 print("Running the reconstruct script...")
-subprocess.run(['npm', 'run', 'reconstruct'], shell=True)
+subprocess.run(["npm", "run", "reconstruct"], shell=True)
 
 # Convert selected enums to python classes
 print("Converting enums...")
 os.makedirs("out/converted/", exist_ok=True)
-for filepath in interesting_files.FILES:
+for filepath in ENUMS:
     with open(filepath, "r", encoding="utf-8") as file:
         content = file.read()
-    matches = re.findall(interesting_files.REGEX_MATCH_ENUM, content, re.MULTILINE)
+        if filepath == PROXY:
+            proxy = next(
+                iter(re.findall(REGEX_MATCH_PROXY, content, re.MULTILINE)), None
+            )
+    matches = re.findall(REGEX_MATCH_ENUM, content, re.MULTILINE)
     for match in matches:
         print(f"Creating {match[0]}")
         with open(f"out/converted/{match[0]}.py", "w", encoding="utf-8") as file:
-            file.write(f"class {match[0]}: " + match[1].replace("//","#").replace(",", ""))
-        pass
+            file.write(
+                f"class {match[0]}: " + match[1].replace("//", "#").replace(",", "")
+            )
+with open("out/converted/__init__.py", "w", encoding="utf-8") as file:
+    file.writelines([f'PROXY = "{proxy}"', f'BASE = "{base_url}"'])
