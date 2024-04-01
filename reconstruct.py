@@ -2,6 +2,7 @@ import requests
 import re
 import os
 import subprocess
+import interesting_files
 
 def download_file(url, filename):
     """
@@ -60,3 +61,16 @@ for script_url, sourcemap_url in sources:
 # Run the reconstruct script using npm
 print("Running the reconstruct script...")
 subprocess.run(['npm', 'run', 'reconstruct'], shell=True)
+
+# Convert selected enums to python classes
+print("Converting enums...")
+os.makedirs("out/converted/", exist_ok=True)
+for filepath in interesting_files.FILES:
+    with open(filepath, "r", encoding="utf-8") as file:
+        content = file.read()
+    matches = re.findall(interesting_files.REGEX_MATCH_ENUM, content, re.MULTILINE)
+    for match in matches:
+        print(f"Creating {match[0]}")
+        with open(f"out/converted/{match[0]}.py", "w", encoding="utf-8") as file:
+            file.write(f"class {match[0]}: " + match[1].replace("//","#").replace(",", ""))
+        pass
